@@ -1,5 +1,7 @@
 # EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER
+Name : SANJAY V
 
+Register No : 212223230188
 ### Aim:
 To generate a PWM wave at the timer pin output and  simuate it on  proteus using an virtual oscilloscope  
 
@@ -96,43 +98,150 @@ Step14. click on debug and simulate using simulation as shown below
   
 
 ## STM 32 CUBE PROGRAM :
+```
+#include "main.h"
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_TIM2_Init(void);
+int main(void)
+{
+  HAL_Init();
+  SystemClock_Config();
+  MX_GPIO_Init();
+  MX_TIM2_Init();
+  HAL_TIM_Base_Start(&htim2);
+  HAL_TIM_PWM_Init(&htim2);
+  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
+  while (1)
+  {
+    
+  }
+}
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+static void MX_TIM2_Init(void)
+{
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 0;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_DOWN;
+  htim2.Init.Period = 10000;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 5000;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  HAL_TIM_MspPostInit(&htim2);
 
+}
+static void MX_GPIO_Init(void)
+{
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
+}
+void Error_Handler(void)
+{
+  __disable_irq();
+  while (1)
+  {
+  }
+}
 
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  
+}
+```
 
 ## Output screen shots of proteus  :
- 
- 
+
+ ![proteus](https://github.com/user-attachments/assets/10784e73-f1dc-41bc-8f11-76de5035ad1e)
+
  ## CIRCUIT DIAGRAM (EXPORT THE GRAPHICS TO PDF AND ADD THE SCREEN SHOT HERE): 
  
+ ![cdpdf](https://github.com/user-attachments/assets/dfcdb109-9499-4b04-a1dd-a0a0da079efe)
 
 ## DUTY CYCLE AND FREQUENCY CALCULATION 
 FOR PULSE AT 500
 
-TON = 
-TOFF=
-TOTAL TIME = 
-FREQUENCY = 1/(TOTAL TIME)
+![500](https://github.com/user-attachments/assets/95c3454c-0c57-40bd-ace8-63105b46af42)
+
+TON = 2ms 
+TOFF=2ms 
+TOTAL TIME = 4ms 
+FREQUENCY = 1/(TOTAL TIME)==1/4=250Hz
 
 FOR PULSE AT 700
 
-TON = 
-TOFF=
-TOTAL TIME = 
-FREQUENCY = 1/(TOTAL TIME)
+![700](https://github.com/user-attachments/assets/5f163a0c-7c50-4b06-8ae9-df23fc3d2d5d)
 
+TON = 3ms 
+TOFF=1ms 
+TOTAL TIME = 4ms 
+FREQUENCY = 1/(TOTAL TIME)=1/4=250Hz
 
 FOR PULSE AT 900
 
-TON = 
-TOFF=
-TOTAL TIME = 
-FREQUENCY = 1/(TOTAL TIME)
+![900](https://github.com/user-attachments/assets/12c032bb-76d5-40d9-a3b8-a3c39335ebfc)
 
+TON = 3.5ms
+TOFF= 0.5ms
+TOTAL TIME = 4ms
+FREQUENCY = 1/(TOTAL TIME)=1/4=250Hz
 
 ## Result :
-A PWM Signal is generated using the following frequency and various duty cycles are simulated 
+A PWM Signal is generated using the following frequency and various duty cycles are simulated.
 
 
 
